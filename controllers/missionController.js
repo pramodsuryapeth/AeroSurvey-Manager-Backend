@@ -155,11 +155,34 @@ exports.createMission = async (req, res) => {
 exports.getAllMissions = async (req, res) => {
   try {
     const missions = await Mission.find()
-      .populate("drone");
+      .populate("drone")
+      .sort({ createdAt: -1 });
+
+    const updatedMissions =
+      missions.map((mission) => {
+        const missionObj =
+          mission.toObject();
+
+        if (missionObj.drone) {
+          // Mission battery ला priority
+          if (
+            missionObj.batteryRemaining !==
+            undefined
+          ) {
+            missionObj.drone.battery =
+              missionObj.batteryRemaining;
+
+            missionObj.drone.batteryRemaining =
+              missionObj.batteryRemaining;
+          }
+        }
+
+        return missionObj;
+      });
 
     res.status(200).json({
       success: true,
-      missions,
+      missions: updatedMissions,
     });
   } catch (error) {
     res.status(500).json({
