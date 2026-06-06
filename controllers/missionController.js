@@ -243,12 +243,14 @@ exports.startMission = async (req, res) => {
 
     if (!mission) {
       return res.status(404).json({
+        success: false,
         message: "Mission not found",
       });
     }
 
     if (mission.status === "completed") {
       return res.status(400).json({
+        success: false,
         message: "Mission already completed",
       });
     }
@@ -259,24 +261,51 @@ exports.startMission = async (req, res) => {
 
     if (!drone) {
       return res.status(404).json({
+        success: false,
         message: "Drone not found",
       });
     }
 
-    if (drone.battery < 20) {
+    // Battery Check
+    if (
+      (drone.batteryRemaining ??
+        drone.battery) < 30
+    ) {
       return res.status(400).json({
+        success: false,
         message:
-          "Battery too low for mission",
+          "Drone battery must be at least 30% to start a mission",
+      });
+    }
+
+    // Check if same drone is already running another mission
+    const activeMission =
+      await Mission.findOne({
+        drone: mission.drone,
+        status: "in-progress",
+        _id: {
+          $ne: mission._id,
+        },
+      });
+
+    if (activeMission) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "This drone is already assigned to another active mission",
       });
     }
 
     drone.status = "in-mission";
+
     await drone.save();
 
-    mission.status = "in-progress";
+    mission.status =
+      "in-progress";
 
     if (!mission.startedAt) {
-      mission.startedAt = new Date();
+      mission.startedAt =
+        new Date();
     }
 
     await mission.save();
@@ -290,12 +319,15 @@ exports.startMission = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Mission Started",
+      message:
+        "Mission Started Successfully",
+      mission,
     });
   } catch (error) {
     console.error(error);
 
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
