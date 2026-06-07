@@ -181,18 +181,56 @@ const chargeDrone = async (
   }
 };
 
-
-
-const startCharging = async (
-  req,
-  res
-) => {
+const startCharging = async ( req, res) => {
   try {
+    const droneId =
+      req.params.id;
+
+    const drone =
+      await Drone.findById(
+        droneId
+      );
+
+    if (!drone) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Drone not found",
+      });
+    }
+
+    // Already charging
+    if (
+      drone.status ===
+      "charging"
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Drone is already charging",
+      });
+    }
+
+    // Active mission check
+    const activeMission =
+      await Mission.findOne({
+        drone: droneId,
+        status: "in-progress",
+      });
+
+    if (activeMission) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Cannot charge drone while mission is in progress",
+      });
+    }
+
     const io = getIO();
 
     chargeDroneSimulation(
       io,
-      req.params.id
+      droneId
     );
 
     res.status(200).json({

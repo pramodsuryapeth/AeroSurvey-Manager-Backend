@@ -42,6 +42,14 @@ app.get("/", (req, res) => {
   res.send("AeroSurvey Manager API Running");
 });
 
+const startScheduledMissions = require("./utils/missionScheduler");
+
+// Start scheduled missions
+// Check every 5 seconds
+setInterval(() => {
+  startScheduledMissions();
+}, 5000);
+
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/drones", require("./routes/droneRoutes"));
 app.use("/api/missions", require("./routes/missionRoutes"));

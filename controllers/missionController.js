@@ -193,20 +193,51 @@ exports.getMissionById = async (req, res) => {
 exports.updateMission = async (req, res) => {
   try {
     const mission =
+      await Mission.findById(
+        req.params.id
+      );
+
+    if (!mission) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Mission not found",
+      });
+    }
+
+    // Cannot update running or completed missions
+    if (
+      ["in-progress", "completed"].includes(
+        mission.status
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Cannot update in-progress or completed missions",
+      });
+    }
+
+    const updatedMission =
       await Mission.findByIdAndUpdate(
         req.params.id,
         req.body,
-        { new: true }
+        {
+          new: true,
+          runValidators: true,
+        }
       );
 
     res.status(200).json({
       success: true,
-      mission,
+      mission:
+        updatedMission,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message:
+        error.message,
     });
   }
 };
