@@ -48,7 +48,7 @@ const startScheduledMissions = require("./utils/missionScheduler");
 // Check every 5 seconds
 setInterval(() => {
   startScheduledMissions();
-}, 5000);
+}, 3000); // 
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/drones", require("./routes/droneRoutes"));
