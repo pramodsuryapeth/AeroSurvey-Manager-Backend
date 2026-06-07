@@ -45,8 +45,8 @@ const startScheduledMissions = async () => {
       }
 
       const missionDateTime = new Date(
-        `${mission.missionDate}T${mission.missionStartTime}:00`
-      );
+  `${mission.missionDate}T${mission.missionStartTime}:00+05:30`
+);
 
       console.log("Current Time:", now);
       console.log(
