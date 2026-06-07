@@ -47,6 +47,7 @@ const startScheduledMissions = require("./utils/missionScheduler");
 // Start scheduled missions
 // Check every 5 seconds
 setInterval(() => {
+  console.log("Scheduler Running");
   startScheduledMissions();
 }, 3000); // 
 
