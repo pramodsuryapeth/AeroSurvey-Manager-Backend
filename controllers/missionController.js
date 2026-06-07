@@ -158,31 +158,9 @@ exports.getAllMissions = async (req, res) => {
       .populate("drone")
       .sort({ createdAt: -1 });
 
-    const updatedMissions =
-      missions.map((mission) => {
-        const missionObj =
-          mission.toObject();
-
-        if (missionObj.drone) {
-          // Mission battery ला priority
-          if (
-            missionObj.batteryRemaining !==
-            undefined
-          ) {
-            missionObj.drone.battery =
-              missionObj.batteryRemaining;
-
-            missionObj.drone.batteryRemaining =
-              missionObj.batteryRemaining;
-          }
-        }
-
-        return missionObj;
-      });
-
     res.status(200).json({
       success: true,
-      missions: updatedMissions,
+      missions,
     });
   } catch (error) {
     res.status(500).json({

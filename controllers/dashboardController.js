@@ -65,22 +65,22 @@ exports.getDashboardData =
           .limit(10);
 
       const activeMapMissions =
-        await Mission.find({
-          status: "in-progress",
-        })
-          .populate("drone")
-          .select(
-            `
-            missionName
-            status
-            progress
-            batteryRemaining
-            currentLocation
-            startLocation
-            endLocation
-            drone
-          `
-          );
+  await Mission.find({
+    status: "in-progress",
+  })
+    .populate("drone")
+    .select(`
+      missionName
+      status
+      progress
+      batteryRemaining
+      currentLocation
+      startLocation
+      endLocation
+      surveyPattern
+      waypoints
+      drone
+    `);
 
       const notifications = [];
 
